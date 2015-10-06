@@ -1,14 +1,15 @@
 require.config({
-    baseUrl: "js/lib",
+    baseUrl: "/js/",
     paths: {
-        moment: 'moment-with-locales',
-        jquery: 'jquery.min',
-        underscore: 'underscore',
-        backbone: 'backbone',
-        'google-charts-bar': 'jsapi.js',
-        'backbone.validation': 'backbone-validation',
-        'bootstrap-datetimepicker': 'bootstrap-datetimepicker',
-        'backbone.localStorage': 'backbone-localstorage'
+        moment: 'lib/moment-with-locales',
+        jquery: 'lib/jquery.min',
+        underscore: 'lib/underscore',
+        backbone: 'lib/backbone',
+        helpers: 'lib/helpers',
+        'google-charts-bar': 'lib/jsapi',
+        'backbone.validation': 'lib/backbone-validation',
+        'bootstrap-datetimepicker': 'lib/bootstrap-datetimepicker',
+        'backbone.localStorage': 'lib/backbone-localstorage'
     },
     shim: {
         moment: {
@@ -32,19 +33,20 @@ require.config({
             deps: ['backbone'],
             exports: 'Backbone'
         },
-        //'google-charts-bar': {
-        //    exports: 'google'
-        //},
-    }
+        'google-charts-bar': {
+            exports: 'google'
+        },
+    },
+    urlArgs: "bust=" + (new Date()).getTime()
 });
 
 require([
         'underscore',
         'jquery',
         'backbone.validation',
-        '../models/time-tracker',
-        '../views/time-tracker',
-        '../collections/time-tracker',
+        'models/timeTracker',
+        'views/timeTracker',
+        'collections/timeTracker',
     ],
     function(_, $, Backbone,  Models, Views, Collections){
         // Extend the callbacks to work with Bootstrap, as used in this example
@@ -86,19 +88,6 @@ require([
                 }
             });
             return o;
-        };
-
-        var TimeHelper = {
-            pad: function(num, size) {
-                var s = "0" + num;
-                return s.substr(s.length-size);
-            },
-            getFormattedTimeFromMilis: function(milis){
-                var hours = Math.floor(milis / 36e5) % 24;
-                var minutes = Math.floor(milis / 6e4) % 60;
-                var seconds = Math.floor(milis / 1000) % 60;
-                return this.pad(hours,2) + ':' + this.pad(minutes,2) + ':' + this.pad(seconds,2);
-            },
         };
 
         Router = Backbone.Router.extend({

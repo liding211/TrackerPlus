@@ -1,10 +1,13 @@
-require([
+define([
         'underscore',
         'backbone',
+        'moment',
+        'helpers',
         'backbone.localStorage'
     ],
-    function(_, Backbone){
+    function(_, Backbone, moment, helpers){
         var Collections = {};
+
         Collections.Logs = Backbone.Collection.extend({
 
             fieldForSort: 'startTime',
@@ -17,7 +20,6 @@ require([
 
             initialize: function(options){
                 this.appSettings = options.appSettings;
-                this.moment = this.appSettings.moment;
                 this._groupedData = this._regroup(),
                     this.listenTo(this, 'add remove sync', this._regroup);
             },
@@ -40,13 +42,13 @@ require([
                 switch(this.groupType){
                     case 'week':
                         that._groupedData = _.groupBy(this.models, function(model){
-                            return this.moment(model.get('startTime')).format('w');
+                            return moment(model.get('startTime')).format('w');
                         });
                         break;
                     case 'day':
                     default:
                         that._groupedData = _.groupBy(this.models, function(model){
-                            return this.moment(model.get('startTime')).format(this.appSettings.get('currentLocal').dateFormat);
+                            return moment(model.get('startTime')).format(this.appSettings.get('currentLocal').dateFormat);
                         }, this);
                         break;
                 };
@@ -54,7 +56,7 @@ require([
 
             analyticsStartDateInMilis: function(){
                 var fromDate = (new String(this.dateRange)).split('_');
-                return this.moment().subtract(fromDate[0], fromDate[1]).valueOf();
+                return moment().subtract(fromDate[0], fromDate[1]).valueOf();
             },
 
             _prepareModelsInGroupForAnalyticsView: function(){
@@ -64,7 +66,7 @@ require([
                     this._groupedData,
                     function(groupOfModels, index){
                         //check if index are in required period of date
-                        if(this.moment(index, this.groupType == 'week' ? 'w' : dateFormat).valueOf() > this.analyticsStartDateInMilis()){
+                        if(moment(index, this.groupType == 'week' ? 'w' : dateFormat).valueOf() > this.analyticsStartDateInMilis()){
                             var analyticsModel = {
                                 indexForSort: index,
                                 period: '',
@@ -76,9 +78,9 @@ require([
                             switch(this.groupType){
                                 case 'week':
                                     analyticsModel.period =
-                                        this.moment(this.moment(index, 'w').startOf('week').valueOf()).format(dateFormat) + ' - ' +
-                                        this.moment(this.moment(index, 'w').endOf('week').valueOf()).format(dateFormat) +
-                                        (this.moment(index, 'w').endOf('week').valueOf() > this.moment().valueOf() ? '(*)' : '');
+                                        moment(moment(index, 'w').startOf('week').valueOf()).format(dateFormat) + ' - ' +
+                                        moment(moment(index, 'w').endOf('week').valueOf()).format(dateFormat) +
+                                        (moment(index, 'w').endOf('week').valueOf() > moment().valueOf() ? '(*)' : '');
                                     break;
                                 case 'day':
                                 default:
@@ -92,7 +94,7 @@ require([
                             });
 
                             //set duration in time format
-                            analyticsModel.timeSpent = TimeHelper.getFormattedTimeFromMilis(
+                            analyticsModel.timeSpent = helpers.TimeHelper.getFormattedTimeFromMilis(
                                 analyticsModel.duration
                             );
 
@@ -125,6 +127,7 @@ require([
             },
 
         });
+
         return Collections;
     }
 );

@@ -1,4 +1,4 @@
-require([
+define([
         'underscore',
         'backbone',
         'backbone.localStorage'
@@ -91,8 +91,6 @@ require([
                 this.fetch();
             },
         });
-
-
 
         return Models;
     }

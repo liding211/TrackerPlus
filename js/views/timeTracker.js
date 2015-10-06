@@ -1,9 +1,14 @@
-require([
+define([
         'underscore',
-        'backbone'
+        'backbone',
+        'google-charts-bar',
+        'moment',
+        'helpers',
+        'bootstrap-datetimepicker'
     ],
-    function(_, Backbone){
+    function(_, Backbone, google, moment, helpers){
         var Views = {};
+
         Views.LogList = Backbone.View.extend({
 
             tagName: 'tbody',
@@ -51,12 +56,11 @@ require([
             initialize: function(options){
                 this.template = _.template( $('#log-list-row').html() );
                 this.appSettings = options.appSettings;
-                this.moment = this.appSettings.moment;
             },
 
             render: function(){
-                this.model.set('startTimeFormatted', this.moment(this.model.get('startTime')).format(this.appSettings.get('currentLocal').dateTimeFormat));
-                this.model.set('durationFormatted', TimeHelper.getFormattedTimeFromMilis(this.model.get('duration')));
+                this.model.set('startTimeFormatted', moment(this.model.get('startTime')).format(this.appSettings.get('currentLocal').dateTimeFormat));
+                this.model.set('durationFormatted', helpers.TimeHelper.getFormattedTimeFromMilis(this.model.get('duration')));
                 var json = this.model.toJSON();
                 var view = this.template(json);
                 this.$el.html(view);
@@ -84,8 +88,8 @@ require([
                 if(!hasError){
                     this.model.set({
                         description: this.$el.find('#descriptionField').val().replace(/\n\r?/g, '<br />'),
-                        startTime: this.moment(this.$el.find('#startTimeField').val(), this.appSettings.get('currentLocal').dateTimeFormat).valueOf(),
-                        duration: this.moment.duration(this.$el.find('#durationField').val()).valueOf(),
+                        startTime: moment(this.$el.find('#startTimeField').val(), this.appSettings.get('currentLocal').dateTimeFormat).valueOf(),
+                        duration: moment.duration(this.$el.find('#durationField').val()).valueOf(),
                         title: this.$el.find('#titleField').val(),
                     });
                     if(this.model.isValid(true)){
@@ -101,14 +105,14 @@ require([
                 var type = $(data).attr('id');
                 switch(type){
                     case 'startTimeField':
-                        if(!this.moment(value, this.appSettings.get('currentLocal').dateTimeFormat).isValid()){
+                        if(!moment(value, this.appSettings.get('currentLocal').dateTimeFormat).isValid()){
                             return false;
                         }
                         break;
                     case 'durationField':
                         if(
-                            !this.moment(value, 'HH:mm:ss').isValid() ||
-                            this.moment.duration(value, 'HH:mm:ss').valueOf() == 0
+                            !moment(value, 'HH:mm:ss').isValid() ||
+                            moment.duration(value, 'HH:mm:ss').valueOf() == 0
                         ){
                             return false;
                         }
@@ -170,7 +174,6 @@ require([
 
                 this.appSettings = options.appSettings;
                 this.formModel = options.formModel;
-                this.moment = this.appSettings.moment;
                 this.modelConstrutor = options.modelConstrutor;
 
                 this.setStoredFormData();
@@ -194,9 +197,9 @@ require([
                 this.model.set({
                     description: this.$('#description').val().replace(/\n\r?/g, '<br />'),
                     startTime: this.$('#start_time').val() ?
-                        this.moment(this.$('#start_time').val(), this.appSettings.get('currentLocal').dateTimeFormat).valueOf() :
+                        moment(this.$('#start_time').val(), this.appSettings.get('currentLocal').dateTimeFormat).valueOf() :
                         0,
-                    duration: this.moment.duration(this.$('#duration').val()).valueOf(),
+                    duration: moment.duration(this.$('#duration').val()).valueOf(),
                     title: this.$('#item_title').val(),
                 });
                 if(this.model.isValid(true)){
@@ -219,8 +222,8 @@ require([
                 this.$('#description').val(this.formModel.get('description'));
                 this.$('#start_time').val(this.formModel.get('startTime'));
                 if(this.formModel.get('startTime') != '' || this.formModel.get('startTime') != false){
-                    this.$('#duration').val(TimeHelper.getFormattedTimeFromMilis(
-                        this.moment().valueOf() - this.moment(
+                    this.$('#duration').val(helpers.TimeHelper.getFormattedTimeFromMilis(
+                        moment().valueOf() - moment(
                             this.formModel.get('startTime'), this.appSettings.get('currentLocal').dateTimeFormat
                         ).valueOf()
                     ));
@@ -300,9 +303,9 @@ require([
                 var minutes = Math.floor(this.timer / 60) % 60;
                 var seconds = this.timer % 60;
                 $('#timer').html(
-                    TimeHelper.pad(hours,2) + ':' +
-                    TimeHelper.pad(minutes,2) + ':' +
-                    TimeHelper.pad(seconds,2)
+                    helpers.TimeHelper.pad(hours,2) + ':' +
+                    helpers.TimeHelper.pad(minutes,2) + ':' +
+                    helpers.TimeHelper.pad(seconds,2)
                 );
             },
 
@@ -449,7 +452,7 @@ require([
             },
 
             render: function(){
-                this.model.set('durationFormatted', TimeHelper.getFormattedTimeFromMilis(this.model.get('duration')));
+                this.model.set('durationFormatted', helpers.TimeHelper.getFormattedTimeFromMilis(this.model.get('duration')));
                 var json = this.model.toJSON();
                 var view = this.template(json);
                 this.$el.html(view);
