@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+        <title>Tracker+</title>
+        
+        <link href="css/bootstrap.min.css" rel="stylesheet" />
+        <link href="css/bootstrap-theme.min.css" rel="stylesheet" />
+        <link href="css/bootstrap-datetimepicker.css" rel="stylesheet" />
+        <link href="css/main.css" rel="stylesheet" />
+        
+        <script src="js/jquery.min.js"></script>
+        <script src="js/moment-with-locales.js"></script>
+        <script src="js/bootstrap-datetimepicker.js"></script>
+        <script src="js/underscore.js"></script>
+        <script src="js/backbone.js"></script>
+        <script src="js/backbone-localstorage.js"></script>
+        <script src="js/backbone-validation.js"></script>
+        <script src="js/jsapi.js"></script>
+        <script src="js/time-tracker.js"></script>
+        <script src="js/main.js"></script>
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="container">
+            <div class="row table" id="top-navigation-container">
+                <h1 class="col-md-2 col-height col-bottom">Tracker+</h1>
+                <nav class="col-md-10 col-height col-bottom">
+                    <ul class="list-inline list-unstyled">
+                        <li><a href="#" class="tab-controller" id="show-tracker">Log Entries</a></li> |
+                        <li><a href="#analytics" class="tab-controller" id="show-analytics">Analytics</a></li> |
+                        <li><a href="#settings" class="tab-controller" id="show-settings">Settings</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="tab-container" id="tracker-container">
+                <div class="well" id="time_tracker">
+                    <div class="row table">
+                        <h3 class="col-md-2">Time Tracker</h3>
+                        <div class="col-md-10">
+                            <ul class="list-inline list-unstyled">
+                                <li><button id="save-tracker-form">Add Time Log</button></li>
+                                <li><a href="#" id="reset-tracker-form">Reset</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row" id="tracker-form-container">
+                        <form id="tracker-form" name="tracker-form">
+                            <div class="col-md-3">
+                                <div class='form-group'>
+                                    <div class="input-group date" id='start_time_container'>
+                                        <input type='text' class="form-control" name="startTime" id="start_time" placeholder="Start date" />
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                    <span class="help-block hidden"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text" size="100" class="form-control" name="title" id="item_title" placeholder="Item name" maxlength="30"/>
+                                    </div>
+                                    <span class="help-block hidden"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <div class="input-group date spent-time-container">
+                                        <input type='text' class="form-control" name="duration" id="duration" placeholder="Time spent (hh:mm:ss)" />
+                                        <span class="input-group-addon" id="tracker-start-button">
+                                            <span class="glyphicon glyphicon-play" id="tracker-start-icon"></span>
+                                        </span>
+                                    </div>
+                                    <div class="input-group form-group spent-time-controller" style="display: none;">
+                                        <span class="input-group-addon" id="tracker-pause-button">
+                                            <span class="glyphicon glyphicon-pause" id="tracker-pause-icon"></span>
+                                        </span>
+                                        <span class="form-control" id="timer">00:00:00</span> 
+                                        <span class="input-group-addon" id="tracker-stop-button">
+                                            <span class="glyphicon glyphicon-stop" id="tracker-stop-icon"></span>
+                                        </span>
+                                    </div>
+                                    <span class="help-block hidden"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group form-group">
+                                    <textarea class="form-control" name="description" id="description"  rows="2">Work description</textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div>
+                    <h3>Time Log</h3>
+                    <table class="time-log-table">
+                        <thead id="log-list-header">
+                            <tr>
+                                <th class="th-start-time" data-sort="startTime">Start time<span class="sort-type"></span></th>
+                                <th class="th-title" data-sort="title">Name<span class="sort-type"></span></th>
+                                <th class="th-duration" data-sort="duration">Time spent<span class="sort-type"></span></th>
+                                <th class="th-description">Description</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-of-tracker-logs"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-container" id="analytics-container">
+                <div class="row table">
+                    <div class="col-md-10">
+                        <h2>Time Aggregation</h2>
+                    </div>
+                    <div class="col-md-2 col-align-right">
+                        <span class="glyphicon glyphicon-list-alt" id="analytics-table"></span> / 
+                        <span class="glyphicon glyphicon-stats" id="analytics-graph"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <ul class="list-inline list-unstyled">
+                            <li>Period:</li> 
+                            <li><a href="#analytics/period/7_days" class="period-controller" data-value="7 days">7 days</a></li> |
+                            <li><a href="#analytics/period/1_month" class="period-controller" data-value="1 month">Month</a></li> |
+                            <li><a href="#analytics/period/3_months" class="period-controller" data-value="3 months">3 Months</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4 col-align-right">
+                        <ul class="list-inline list-unstyled">
+                            <li>Group by:</li> 
+                            <li><a href="#analytics/group_by/day" class="group-by-controller" data-value="day">Day</a></li> | 
+                            <li><a href="#analytics/group_by/week" class="group-by-controller" data-value="week">Week</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12" id="analytics-table-container">
+                        <table class="analytics-table">
+                            <thead>
+                                <th>Date</th>
+                                <th>Time Spent</th>
+                            </thead>
+                            <tbody id="analytics-rows-container">
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="col-md-12" id="analytics-graph-container" hidden>
+                        <div id="chart_div"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-container" id="settings-container"></div>
+        </div>
+        <script type="text/template" id="log-list-row">
+            <td><span class="log-row-data" id="startTimeField"><%= startTimeFormatted %></span></td>
+            <td><span class="log-row-data" id="titleField"><%= title %></span></td>
+            <td><span class="log-row-data" id="durationField"><%= durationFormatted %></span></td>
+            <td><span class="log-row-data" id="descriptionField"><%= description %></span></td>
+            <td>
+                <div id="log-row-control-buttons" hidden>
+                    <div id="on-edit-buttons" hidden>
+                        <span class="glyphicon glyphicon-floppy-save" id="save-log-row"></span>
+                        <span class="glyphicon glyphicon-ban-circle" id="cansel-changes-log-row"></span>
+                    </div>
+                    <div id="on-hover-buttons">
+                        <span class="glyphicon glyphicon-pencil" id="edit-log-row"></span>
+                        <span class="glyphicon glyphicon-trash" id="delete-log-row"></span>
+                    </div>
+                </div>
+            </td>
+        </script>
+        <script type="text/template" id="analytic-data-row">
+            <td><%= period %></td>
+            <td><%= durationFormatted %></td>
+        </script>
+        <script type="text/template" id="analytic-data-graph">
+            <td><%= period %></td>
+            <td><%= durationFormatted %></td>
+        </script>
+        <script type="text/template" id="settings-template">
+            <div><h3>Date Format</h3></div>
+            <div class="row table" id="settings-local">
+                <div class="col-md-2">
+                    <select class="form-control" id="time-format-selecter">
+                        <% _.each(availableLocals, function(local, index){ %>
+                            <option value="<%= local.local %>" 
+                            <% if(index == currentLocal.local) { %>
+                                selected
+                            <% } %>
+                            ><%= local.name %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="col-md-10">Example: <span id="time-example"></span></div>
+            </div>
+        </script>
+    </body>
+</html>
